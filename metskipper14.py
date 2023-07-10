@@ -17,6 +17,9 @@ exon14_skipped = False
 spliced_out_portions = []
 splice_junction_coordinates = []
 
+# Create output file name
+output_file = os.path.splitext(args.input)[0] + "_output.tab"
+
 # Read the SJ.out.tab file
 with open(args.input, "r") as file:
     for line in file:
@@ -61,3 +64,21 @@ if exon14_skipped:
         print()
 else:
     print("MET exon 14 skipping not detected.")
+
+
+# Write results to the output file
+with open(output_file, "w") as output:
+    if exon14_skipped:
+        if len(splice_junction_coordinates) > 1:
+            output.write("MET exon 14 skipping detected in multiple hits.\n")
+        else:
+            output.write("MET exon 14 skipping detected in a single hit.\n")
+        
+        for i in range(len(splice_junction_coordinates)):
+            output.write(f"Hit {i+1}\n")
+            output.write("Portion of exon 14 spliced out: {:.2%}\n".format(spliced_out_portions[i]))
+            output.write("Splice Junction Coordinates: " + splice_junction_coordinates[i] + "\n\n")
+    else:
+        output.write("MET exon 14 skipping not detected.\n")
+
+print("Results saved in " + output_file)
